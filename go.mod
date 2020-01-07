@@ -1,4 +1,4 @@
-module github.com/t0mk/pacli
+module github.com/t0mk/packetjq
 
 go 1.13
 

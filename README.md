@@ -11,7 +11,7 @@ curl -X GET -H "X-Auth-Token: $PACKET_AUTH_TOKEN" https://api.packet.net/project
 instead, you can do just
 
 ```
-packetjq -p project -q ".projects[].name"
+./packetjq -p projects -q ".projects[].name"
 ```
 
 Using https://github.com/itchyny/gojq for the JSON parsing.
