@@ -15,6 +15,8 @@ instead, you can do just
 ```
 
 ## Usage
+
+You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
  
 To list devices in all projects, simply do
 
