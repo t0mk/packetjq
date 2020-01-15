@@ -26,6 +26,7 @@ func main() {
 			&cli.StringFlag{Name: "path, p", Required: true},
 			&cli.StringFlag{Name: "method, m", Value: "GET"},
 			&cli.StringFlag{Name: "query, q"},
+			&cli.StringFlag{Name: "requestbody, r"},
 		},
 	}
 	err := app.Run(os.Args)
@@ -38,11 +39,20 @@ func getjson(c *cli.Context) error {
 	p := c.String("path")
 	m := c.String("method")
 	q := c.String("query")
+	r := c.String("requestbody")
 	urlp, err := url.Parse("https://api.packet.net/" + p)
 	if err != nil {
 		return err
 	}
-	req, err := retryablehttp.NewRequest(m, urlp.String(), nil)
+
+	var reqbody []byte
+	if r == "" {
+		reqbody = nil
+	} else {
+		reqbody = []byte(r)
+	}
+
+	req, err := retryablehttp.NewRequest(m, urlp.String(), reqbody)
 	if err != nil {
 		return err
 	}
