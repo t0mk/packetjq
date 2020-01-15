@@ -18,13 +18,14 @@ instead, you can do just
 
 You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
  
-### To list devices in all projects
+### List devices in all projects
 
 ```
 ./packetjq -p "projects?include=devices" -q ".projects[].devices[].hostname"
 ```
 
 ### Create new read-only API key
+
 ```
 ./packetjq -p "user/api-keys" -m POST -r '{"description": "newKey", "read_only": true}'
 {
@@ -38,6 +39,12 @@ You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
   },
   "read_only": true
 }
+```
+
+### Delete API key
+
+```
+./packetjq -p "user/api-keys/958c3495-0331-40c5-bb80-d946a8e6df05" -m DELETE
 ```
 
 Using https://github.com/itchyny/gojq for the JSON parsing.

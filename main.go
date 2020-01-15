@@ -101,9 +101,14 @@ func getjson(c *cli.Context) error {
 		if err != nil {
 			return err
 		}
+		if len(body) == 0 {
+			fmt.Println("Empty response body")
+			return nil
+		}
 		if err := json.Indent(dst, body, "", "  "); err != nil {
 			return err
 		}
+
 		fmt.Println(dst.String())
 	}
 
