@@ -28,34 +28,12 @@ You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
 
 ```
 ./packetjq -p "user/api-keys" -m POST -r '{"description": "newKey", "read_only": true}'
-{
-  "id": "6973b150-3a8d-471a-860e-m423io4no234",
-  "token": "f049vm309m09mve0FDdsgdfg04GFgdfg",
-  "created_at": "2020-01-15T14:39:06Z",
-  "updated_at": "2020-01-15T14:39:06Z",
-  "description": "newKey",
-  "user": {
-    "href": "/users/ef43523e-8800-44ff-a31f-edd1a2cbf86d"
-  },
-  "read_only": true
-}
 ```
 
 ### Create Project API key
 
 ```
 tomk@xps ~/packetjq ±master » ./packetjq -p "projects/1ff4bd4e-5901-4b39-9b19-58d619132322/api-keys" -m POST -r '{"description": "aaaa2", "read_only": true}'
-{
-  "id": "4e211a24-72eb-4012-9f94-bceca14295b1",
-  "token": "GGDFGDFGr3g3GFG34g43gGE3Ggkuik78",
-  "created_at": "2020-01-15T15:54:26Z",
-  "updated_at": "2020-01-15T15:54:26Z",
-  "description": "aaaa2",
-  "project": {
-    "href": "/projects/1ff4bd4e-5901-4b39-9b19-58d619132322"
-  },
-  "read_only": true
-}
 ```
 
 ### Delete API key
