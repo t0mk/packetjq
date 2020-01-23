@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/ioutil"
 	"log"
+	"net/http/httputil"
 	"net/url"
 	"os"
 
@@ -26,6 +27,7 @@ func main() {
 			&cli.StringFlag{Name: "path, p", Required: true},
 			&cli.StringFlag{Name: "method, m", Value: "GET"},
 			&cli.StringFlag{Name: "query, q"},
+			&cli.BoolFlag{Name: "debug, d"},
 			&cli.StringFlag{Name: "requestbody, r"},
 		},
 	}
@@ -40,6 +42,7 @@ func getjson(c *cli.Context) error {
 	m := c.String("method")
 	q := c.String("query")
 	r := c.String("requestbody")
+	d := c.Bool("debug")
 	urlp, err := url.Parse("https://api.packet.net/" + p)
 	if err != nil {
 		return err
@@ -66,10 +69,19 @@ func getjson(c *cli.Context) error {
 	req.Header.Add("Accept", mediaType)
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = nil
+	if d {
+		o, _ := httputil.DumpRequestOut(req.Request, false)
+		bbs, _ := req.BodyBytes()
+		log.Printf("\n=======[REQUEST]=============%s%s\n\n", string(o), string(bbs))
+	}
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
 		return err
+	}
+	if d {
+		o, _ := httputil.DumpResponse(resp, true)
+		log.Printf("\n=======[RESPONSE]============%s\n\n", string(o))
 	}
 	defer resp.Body.Close()
 	if q != "" {
@@ -92,7 +104,7 @@ func getjson(c *cli.Context) error {
 				return fmt.Errorf("invalid json: %s\n", err)
 			}
 			if err := printValue(code.Run(v)); err != nil {
-				return fmt.Errorf("whiile running: %s", err)
+				return fmt.Errorf("while running: %s", err)
 			}
 		}
 	} else {
