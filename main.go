@@ -10,6 +10,8 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"regexp"
+	"strings"
 
 	"github.com/fatih/color"
 	"github.com/hashicorp/go-retryablehttp"
@@ -35,6 +37,18 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func dumpRequest(req *retryablehttp.Request) {
+	o, _ := httputil.DumpRequestOut(req.Request, false)
+	strReq := string(o)
+	reg, _ := regexp.Compile(`X-Auth-Token: (\w*)`)
+	reMatches := reg.FindStringSubmatch(strReq)
+	if len(reMatches) == 2 {
+		strReq = strings.Replace(strReq, reMatches[1], strings.Repeat("-", len(reMatches[1])), 1)
+	}
+	bbs, _ := req.BodyBytes()
+	log.Printf("\n=======[REQUEST]=============\n%s%s\n", strReq, string(bbs))
 }
 
 func getjson(c *cli.Context) error {
@@ -70,9 +84,7 @@ func getjson(c *cli.Context) error {
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = nil
 	if d {
-		o, _ := httputil.DumpRequestOut(req.Request, false)
-		bbs, _ := req.BodyBytes()
-		log.Printf("\n=======[REQUEST]=============%s%s\n\n", string(o), string(bbs))
+		dumpRequest(req)
 	}
 
 	resp, err := httpClient.Do(req)
