@@ -27,8 +27,21 @@ You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
 ### List Spot Market Prices in a specific facility
 
 ```
-./packetjq -p "market/spot/prices" -q -q ".spot_market_prices.ams1"
+./packetjq -p "market/spot/prices" -q ".spot_market_prices.ams1"
 ```
+
+### Show spot market price for specific type in a specific facility
+
+```
+./packetjq -p "market/spot/prices" -q ".spot_market_prices.ams1.\"s3.xlarge.x86\""
+```
+
+### Show spot price of a plan across facilities
+
+```
+./packetjq -p "market/spot/prices"  -q '.spot_market_prices|keys[] as $k | "\($k) \(.[$k].baremetal_0.price)"' | grep -v null
+```
+
  
 ### List devices in all projects
 
