@@ -14,9 +14,21 @@ instead, you can do just
 ./packetjq -p projects -q ".projects[].name"
 ```
 
+## Install
+
+```
+go get github.com/t0mk/packetjq
+```
+
 ## Usage
 
 You need to set your Packet API token to envvar `PACKET_AUTH_TOKEN`.
+
+### List Spot Market Prices in a specific facility
+
+```
+./packetjq -p "market/spot/prices" -q -q ".spot_market_prices.ams1"
+```
  
 ### List devices in all projects
 

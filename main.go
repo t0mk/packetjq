@@ -17,20 +17,21 @@ import (
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/hokaccha/go-prettyjson"
 	"github.com/itchyny/gojq"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	app := &cli.App{
-		Action: getjson,
-		Name:   "getjson",
+		Action: getAndParse,
+		Name:   "getandparse",
 		Usage:  "get JSON from Packet API",
 		Flags: []cli.Flag{
-			&cli.StringFlag{Name: "path, p", Required: true},
-			&cli.StringFlag{Name: "method, m", Value: "GET"},
-			&cli.StringFlag{Name: "query, q"},
-			&cli.BoolFlag{Name: "debug, d"},
-			&cli.StringFlag{Name: "requestbody, r"},
+			&cli.StringFlag{Name: "path", Aliases: []string{"p"}},
+			&cli.StringFlag{Name: "method", Aliases: []string{"m"}, Value: "GET"},
+			&cli.StringFlag{Name: "query", Aliases: []string{"q"}},
+			&cli.BoolFlag{Name: "debug", Aliases: []string{"d"}},
+			&cli.StringFlag{Name: "requestbody", Aliases: []string{"r"}},
+			&cli.PathFlag{Name: "dummyjsonresponse", Aliases: []string{"j"}},
 		},
 	}
 	err := app.Run(os.Args)
@@ -51,15 +52,14 @@ func dumpRequest(req *retryablehttp.Request) {
 	log.Printf("\n=======[REQUEST]=============\n%s%s\n", strReq, string(bbs))
 }
 
-func getjson(c *cli.Context) error {
+func getJsonFromAPI(c *cli.Context) ([]byte, error) {
 	p := c.String("path")
 	m := c.String("method")
-	q := c.String("query")
 	r := c.String("requestbody")
 	d := c.Bool("debug")
 	urlp, err := url.Parse("https://api.packet.net/" + p)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var reqbody []byte
@@ -71,11 +71,11 @@ func getjson(c *cli.Context) error {
 
 	req, err := retryablehttp.NewRequest(m, urlp.String(), reqbody)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	ak := os.Getenv("PACKET_AUTH_TOKEN")
 	if ak == "" {
-		return fmt.Errorf("set PACKET_AUTH_TOKEN")
+		return nil, fmt.Errorf("set PACKET_AUTH_TOKEN")
 	}
 	mediaType := "application/json"
 	req.Header.Add("X-Auth-Token", ak)
@@ -89,17 +89,52 @@ func getjson(c *cli.Context) error {
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	if d {
 		o, _ := httputil.DumpResponse(resp, true)
 		log.Printf("\n=======[RESPONSE]============%s\n\n", string(o))
 	}
 	defer resp.Body.Close()
+	return ioutil.ReadAll(resp.Body)
+}
+
+func checkFlags(c *cli.Context) {
+	j := c.Path("dummyjsonresponse")
+	p := c.String("path")
+	r := c.String("requestbody")
+	if len(j) > 0 {
+		if len(p) > 0 {
+			panic(fmt.Errorf("No reason to set path if you supply local json"))
+		}
+		if len(r) > 0 {
+			panic(fmt.Errorf("No reason to set request body if you supply local json"))
+		}
+	}
+
+}
+
+func getAndParse(c *cli.Context) error {
+	var jsbytes []byte
+	var err error
+	q := c.String("query")
+	j := c.Path("dummyjsonresponse")
+
+	checkFlags(c)
+
+	if len(j) > 0 {
+		jsbytes, err = ioutil.ReadFile(j)
+		if err != nil {
+			return err
+		}
+	} else {
+		jsbytes, err = getJsonFromAPI(c)
+	}
+
 	if q != "" {
 
-		var buf bytes.Buffer
-		dec := json.NewDecoder(io.TeeReader(resp.Body, &buf))
+		//var buf bytes.Buffer
+		dec := json.NewDecoder(bytes.NewReader(jsbytes))
 		dec.UseNumber()
 
 		code, err := gojq.Parse(q)
@@ -112,7 +147,7 @@ func getjson(c *cli.Context) error {
 				if err == io.EOF {
 					break
 				}
-				log.Println(err, "invalid JSON:", buf.String())
+				log.Println(err, "invalid JSON:", string(jsbytes))
 				return fmt.Errorf("invalid json: %s\n", err)
 			}
 			if err := printValue(code.Run(v)); err != nil {
@@ -121,15 +156,11 @@ func getjson(c *cli.Context) error {
 		}
 	} else {
 		dst := &bytes.Buffer{}
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return err
-		}
-		if len(body) == 0 {
+		if len(jsbytes) == 0 {
 			fmt.Println("Empty response body")
 			return nil
 		}
-		if err := json.Indent(dst, body, "", "  "); err != nil {
+		if err := json.Indent(dst, jsbytes, "", "  "); err != nil {
 			return err
 		}
 

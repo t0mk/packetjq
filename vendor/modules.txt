@@ -1,0 +1,33 @@
+# github.com/alecthomas/participle v0.4.2-0.20191220090139-9fbceec1d131
+github.com/alecthomas/participle
+github.com/alecthomas/participle/lexer
+# github.com/cpuguy83/go-md2man/v2 v2.0.0-20190314233015-f79a8a8ca69d
+github.com/cpuguy83/go-md2man/v2/md2man
+# github.com/fatih/color v1.7.0
+github.com/fatih/color
+# github.com/hashicorp/go-cleanhttp v0.5.1
+github.com/hashicorp/go-cleanhttp
+# github.com/hashicorp/go-retryablehttp v0.6.4
+github.com/hashicorp/go-retryablehttp
+# github.com/hokaccha/go-prettyjson v0.0.0-20190818114111-108c894c2c0e
+github.com/hokaccha/go-prettyjson
+# github.com/itchyny/gojq v0.7.0
+github.com/itchyny/gojq
+# github.com/lestrrat-go/strftime v1.0.0
+github.com/lestrrat-go/strftime
+# github.com/mattn/go-colorable v0.1.4
+github.com/mattn/go-colorable
+# github.com/mattn/go-isatty v0.0.11
+github.com/mattn/go-isatty
+# github.com/pbnjay/strptime v0.0.0-20140226051138-5c05b0d668c9
+github.com/pbnjay/strptime
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/russross/blackfriday/v2 v2.0.1
+github.com/russross/blackfriday/v2
+# github.com/shurcooL/sanitized_anchor_name v1.0.0
+github.com/shurcooL/sanitized_anchor_name
+# github.com/urfave/cli/v2 v2.2.0
+github.com/urfave/cli/v2
+# golang.org/x/sys v0.0.0-20191026070338-33540a1f6037
+golang.org/x/sys/unix
