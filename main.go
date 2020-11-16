@@ -57,7 +57,7 @@ func getJsonFromAPI(c *cli.Context) ([]byte, error) {
 	m := c.String("method")
 	r := c.String("requestbody")
 	d := c.Bool("debug")
-	urlp, err := url.Parse("https://api.packet.net/" + p)
+	urlp, err := url.Parse("https://api.equinix.com/metal/v1/" + p)
 	if err != nil {
 		return nil, err
 	}
